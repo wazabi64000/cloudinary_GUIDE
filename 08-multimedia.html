@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>8. Multimédia - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+    pre { background: #000000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    img, video { max-width: 100%; height: auto; display: block; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html" class="active">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Affichage et manipulation des médias</h1>
+
+    <section>
+      <h2>Affichage simple d’une image</h2>
+      <img src="https://res.cloudinary.com/demo/image/upload/v1612376789/sample.jpg" alt="Exemple image" />
+
+      <pre><code>&lt;img src="https://res.cloudinary.com/demo/image/upload/v1612376789/sample.jpg" alt="Exemple image" /&gt;</code></pre>
+    </section>
+
+    <section>
+      <h2>Lecture vidéo depuis Cloudinary</h2>
+      <video controls>
+        <source src="https://res.cloudinary.com/demo/video/upload/v1612376789/sample.mp4" type="video/mp4" />
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
+
+      <pre><code>&lt;video controls&gt;
+  &lt;source src="https://res.cloudinary.com/demo/video/upload/v1612376789/sample.mp4" type="video/mp4" /&gt;
+  Votre navigateur ne supporte pas la lecture vidéo.
+&lt;/video&gt;</code></pre>
+    </section>
+
+    <section>
+      <h2>Transformation dynamique des médias</h2>
+      <p>Cloudinary permet de transformer les images et vidéos à la volée grâce à des paramètres dans l’URL, par exemple :</p>
+      <ul>
+        <li>Redimensionner une image : <code>https://res.cloudinary.com/demo/image/upload/w_300,h_200/sample.jpg</code></li>
+        <li>Appliquer un filtre de flou : <code>https://res.cloudinary.com/demo/image/upload/e_blur:200/sample.jpg</code></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

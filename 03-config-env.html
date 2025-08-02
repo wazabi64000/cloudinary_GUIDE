@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>3. Configuration & .env - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+    pre { background: #000000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html" class="active">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Configuration Cloudinary & gestion sécurisée des clés avec .env</h1>
+
+<section>
+  <h2>Introduction</h2>
+  <p>
+    Pour interagir avec l’API Cloudinary, il faut utiliser un <strong>SDK</strong> (Software Development Kit) fourni par Cloudinary. 
+    Ce SDK est une bibliothèque de code qui facilite la communication entre votre application et le service Cloudinary. 
+    Il vous permet, par exemple, d’envoyer des fichiers, modifier des images, ou supprimer des médias, sans écrire vous-même toutes les requêtes réseau.
+  </p>
+
+  <p>
+    Pour que Cloudinary reconnaisse votre application, vous devez configurer ce SDK avec des <strong>identifiants d’authentification</strong>. 
+    Ces identifiants sont composés de :
+  </p>
+  <ul>
+    <li><strong>Cloud name</strong> : nom unique de votre compte Cloudinary.</li>
+    <li><strong>API key</strong> : clé publique qui identifie votre application.</li>
+    <li><strong>API secret</strong> : clé privée qui authentifie vos requêtes.</li>
+  </ul>
+
+  <p>
+    <strong>Attention :</strong> ces clés sont sensibles, surtout l’API secret. 
+    Il est crucial de ne jamais exposer ces clés publiquement, par exemple dans un code client (JavaScript côté navigateur) ou dans un dépôt GitHub public. 
+    Exposer ces clés peut permettre à des personnes malintentionnées d’accéder à votre compte Cloudinary, d’altérer ou supprimer vos fichiers, ou d’utiliser vos quotas.
+  </p>
+
+  <p>
+    La bonne pratique consiste à stocker ces clés dans un fichier <code>.env</code>, accessible uniquement côté serveur, et à les charger via une librairie comme <code>dotenv</code>. 
+    Ainsi, elles restent sécurisées et vous pouvez facilement changer ces valeurs sans modifier votre code source.
+  </p>
+</section>
+
+    <section>
+      <h2>Étape 1 : Créer un compte Cloudinary</h2>
+      <p>Rendez-vous sur <a href="https://cloudinary.com/" target="_blank" rel="noopener noreferrer">cloudinary.com</a> et créez un compte gratuit. Une fois connecté, vous trouverez vos identifiants dans le tableau de bord :</p>
+      <ul>
+        <li><strong>Cloud name</strong></li>
+        <li><strong>API Key</strong></li>
+        <li><strong>API Secret</strong></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Étape 2 : Créer le fichier <code>.env</code></h2>
+      <p>Pour stocker vos clés en sécurité dans votre projet, créez un fichier nommé <code>.env</code> à la racine du projet :</p>
+      <pre><code># .env
+CLOUDINARY_CLOUD_NAME=votre_cloud_name
+CLOUDINARY_API_KEY=votre_api_key
+CLOUDINARY_API_SECRET=votre_api_secret
+</code></pre>
+      <p><strong>Important :</strong> ajoutez <code>.env</code> à votre fichier <code>.gitignore</code> pour éviter de versionner ces données sensibles.</p>
+    </section>
+
+    <section>
+      <h2>Étape 3 : Configuration du SDK Cloudinary</h2>
+      <p>Créez un fichier dédié à la configuration Cloudinary, par exemple <code>cloudinary.config.js</code> dans un dossier <code>config/</code>. Voici un exemple sécurisé :</p>
+      <pre><code>// config/cloudinary.config.js
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,  // Toujours utiliser HTTPS
+});
+
+export default cloudinary;
+</code></pre>
+      <p><strong>Explication :</strong></p>
+      <ul>
+        <li><code>dotenv.config()</code> charge les variables du fichier <code>.env</code>.</li>
+        <li>Les valeurs sont passées à <code>cloudinary.config()</code> pour sécuriser la connexion.</li>
+        <li><code>secure: true</code> force l’utilisation de HTTPS pour toutes les URLs.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Pourquoi ne pas mettre les clés en dur dans le code ?</h2>
+      <p>Exposer vos clés directement dans le code source peut compromettre la sécurité de votre application. Toute personne ayant accès au code pourrait accéder à vos services Cloudinary et potentiellement modifier ou supprimer vos ressources.</p>
+    </section>
+
+    <section>
+      <h2>Alternatives pour gérer les variables d'environnement</h2>
+      <ul>
+        <li>Utiliser des services comme <code>Vault</code> ou <code>AWS Secrets Manager</code> pour une gestion professionnelle des secrets.</li>
+        <li>Configurer les variables directement dans l’environnement d’exécution (ex : variables d’environnement sur un serveur de production ou dans Docker).</li>
+      </ul>
+    </section>
+
+  </main>
+</body>
+</html>

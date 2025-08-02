@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>5. Controller - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+    pre { background: #000000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html" class="active">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Controller pour gérer les opérations sur les médias</h1>
+
+    <section>
+      <h2>Rôle du Controller</h2>
+      <p>
+        Le controller contient la logique métier liée aux médias : il reçoit les requêtes, traite les fichiers uploadés, interagit avec Cloudinary, puis renvoie une réponse adaptée au client.
+      </p>
+    </section>
+
+    <section>
+      <h2>Exemple détaillé d’un controller d’upload</h2>
+      <pre><code>import cloudinary from '../config/cloudinary.config.js';
+
+export const uploadMedia = (req, res) => {
+  // Vérifier si un fichier a bien été uploadé via le middleware Multer
+  if (!req.file) {
+    return res.status(400).json({ message: 'Aucun fichier reçu' });
+  }
+
+  // Récupérer l'URL publique du média sur Cloudinary depuis req.file.path
+  // Utilisation de l’opérateur ?. pour éviter les erreurs si req.file est undefined
+  // Si aucun fichier, la chaîne vide évite une erreur
+  const image = req.file?.path || '';
+
+  // On extrait d’autres infos utiles du fichier uploadé pour la réponse
+  const { filename, mimetype, size } = req.file;
+
+  // Répondre avec un statut 201 (ressource créée) et les détails du fichier
+  res.status(201).json({
+    message: 'Upload réussi',
+    data: {
+      url: image,        // URL accessible du média sur Cloudinary
+      public_id: filename, // ID unique généré par Cloudinary
+      mimetype,          // Type MIME du fichier (ex : image/jpeg)
+      size,              // Taille en octets du fichier
+    }
+  });
+};
+</code></pre>
+
+      <h3>Explications ligne par ligne :</h3>
+      <ul>
+        <li><code>if (!req.file) {...}</code> : Vérifie si Multer a bien reçu un fichier. Sinon, on renvoie une erreur 400 (requête mal formée).</li>
+        <li><code>const image = req.file?.path || '';</code> : Récupère l’URL publique du média sur Cloudinary, ou chaîne vide si absence de fichier.</li>
+        <li><code>const { filename, mimetype, size } = req.file;</code> : Extrait des informations du fichier uploadé pour les renvoyer au client.</li>
+        <li><code>res.status(201).json({...})</code> : Envoie une réponse JSON indiquant la réussite avec les détails du média.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Controller pour supprimer un média</h2>
+      <pre><code>import cloudinary from '../config/cloudinary.config.js';
+
+export const deleteMedia = async (req, res) => {
+  const { public_id } = req.params; // Récupérer l'identifiant Cloudinary du média à supprimer
+
+  try {
+    // Appeler l'API Cloudinary pour supprimer le média par son public_id
+    const result = await cloudinary.uploader.destroy(public_id);
+
+    if (result.result === 'ok') {
+      // Suppression réussie : informer le client
+      res.json({ message: 'Fichier supprimé avec succès' });
+    } else {
+      // Média non trouvé sur Cloudinary
+      res.status(404).json({ message: 'Fichier non trouvé' });
+    }
+  } catch (error) {
+    // En cas d'erreur serveur, log et informer le client
+    console.error(error);
+    res.status(500).json({ message: 'Erreur lors de la suppression', error: error.message });
+  }
+};
+</code></pre>
+
+      <h3>Explications :</h3>
+      <ul>
+        <li><code>const { public_id } = req.params;</code> : Récupère l’identifiant unique Cloudinary envoyé dans l’URL.</li>
+        <li><code>cloudinary.uploader.destroy(public_id);</code> : Appelle l’API Cloudinary pour supprimer le média correspondant.</li>
+        <li>On vérifie le résultat pour renvoyer un message clair selon succès ou échec.</li>
+        <li>Gestion des erreurs avec try/catch et logs.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Bonnes pratiques pour le Controller</h2>
+      <ul>
+        <li>Toujours valider la présence et la validité des données reçues (fichier, params, body).</li>
+        <li>Gérer proprement les erreurs pour éviter de planter le serveur et fournir un message utile à l’utilisateur.</li>
+        <li>Ne jamais exposer d’informations sensibles (ex : clés API) dans les messages d’erreur.</li>
+        <li>Documenter clairement chaque fonction pour faciliter la maintenance et l’évolution.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

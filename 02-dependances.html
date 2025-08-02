@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>2. Dépendances - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background-color: #f5f5f5; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html" class="active">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Dépendances essentielles pour gérer les médias avec Cloudinary</h1>
+
+    <section>
+      <h2>Présentation des principales dépendances</h2>
+      <p>Pour construire un système d’upload simple, fiable et évolutif, on utilise :</p>
+      <ul>
+        <li><code>express</code> : serveur web léger et populaire pour Node.js</li>
+        <li><code>multer</code> : middleware pour gérer les données <code>multipart/form-data</code> des formulaires d’upload</li>
+        <li><code>multer-storage-cloudinary</code> : extension permettant d’envoyer directement les fichiers reçus par Multer vers Cloudinary</li>
+        <li><code>cloudinary</code> : SDK officiel pour communiquer avec l’API Cloudinary et gérer les médias</li>
+        <li><code>dotenv</code> : gestion des variables d’environnement, pour garder vos clés en sécurité</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Comparaison rapide avec d’autres solutions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Dépendance</th>
+            <th>Rôle</th>
+            <th>Avantages</th>
+            <th>Inconvénients</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>express</td>
+            <td>Framework HTTP</td>
+            <td>Léger, très documenté, communauté large</td>
+            <td>Pas de gestion native des fichiers</td>
+          </tr>
+          <tr>
+            <td>multer</td>
+            <td>Parser formulaire multipart</td>
+            <td>Simple à configurer, supporte multiples fichiers</td>
+            <td>Stockage local par défaut, pas de stockage cloud intégré</td>
+          </tr>
+          <tr>
+            <td>multer-storage-cloudinary</td>
+            <td>Stockage Multer direct sur Cloudinary</td>
+            <td>Upload cloud direct, évite stockage local</td>
+            <td>Moins flexible que custom storage, dépend de Multer</td>
+          </tr>
+          <tr>
+            <td>cloudinary</td>
+            <td>SDK API Cloudinary</td>
+            <td>Transformations avancées, gestion media facile</td>
+            <td>Courbe d’apprentissage possible</td>
+          </tr>
+          <tr>
+            <td>dotenv</td>
+            <td>Gestion config sensible</td>
+            <td>Simple, protège les clés</td>
+            <td>Nécessite vigilance sur .env dans .gitignore</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Alternatives possibles</h2>
+      <p>
+        - Pour le middleware d’upload : <code>busboy</code>, <code>formidable</code> sont d’autres options très puissantes mais plus complexes.<br />
+        - Pour le stockage cloud : AWS S3 (avec <code>multer-s3</code>), Google Cloud Storage.<br />
+        - Pour la gestion des variables d’environnement : <code>config</code> ou <code>cross-env</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Installation rapide</h2>
+      <p>Commandes npm pour installer les packages :</p>
+      <pre><code>npm install express multer multer-storage-cloudinary cloudinary dotenv</code></pre>
+    </section>
+
+    <section>
+      <h2>Exemple simple d'import des dépendances dans un fichier Node.js</h2>
+      <pre><code>import express from 'express';
+import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();</code></pre>
+    </section>
+  </main>
+</body>
+</html>

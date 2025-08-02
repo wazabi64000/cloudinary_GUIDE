@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>4. Middleware - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+    pre { background: #000000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html" class="active">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Middleware Multer pour l’upload des médias</h1>
+
+    <section>
+      <h2>Introduction</h2>
+      <p>Le middleware Multer est responsable de parser les données <code>multipart/form-data</code> envoyées depuis un formulaire, et de stocker temporairement les fichiers en local ou directement sur un service cloud.</p>
+    </section>
+
+    <section>
+      <h2>Configurer Multer avec CloudinaryStorage</h2>
+      <p>Pour intégrer Multer avec Cloudinary, on utilise <code>multer-storage-cloudinary</code>, qui permet d’envoyer directement les fichiers vers Cloudinary sans stockage local.</p>
+      <p>Voici un exemple de middleware dans un fichier <code>middlewares/upload.js</code> :</p>
+      <pre><code>import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../config/cloudinary.config.js';
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'votre_dossier_media', // dossier dans Cloudinary
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'mp4'], // formats acceptés
+    transformation: [{ width: 800, height: 800, crop: 'limit' }], // optionnel
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'video/mp4'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Format de fichier non supporté'));
+    }
+  },
+});
+
+export default upload;
+</code></pre>
+      <p><strong>Explications :</strong></p>
+      <ul>
+        <li><code>CloudinaryStorage</code> définit où et comment stocker les fichiers dans Cloudinary.</li>
+        <li><code>folder</code> : permet d’organiser vos médias dans un dossier spécifique sur Cloudinary.</li>
+        <li><code>allowed_formats</code> : sécurise les types de fichiers acceptés.</li>
+        <li><code>transformation</code> : options Cloudinary pour modifier les images à l’upload (redimension, etc.).</li>
+        <li><code>limits.fileSize</code> : limite la taille des fichiers pour éviter les uploads trop lourds.</li>
+        <li><code>fileFilter</code> : filtre personnalisé pour valider le type MIME des fichiers.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Utilisation dans une route</h2>
+      <p>Dans votre route, utilisez ce middleware pour récupérer un fichier en champ nommé <code>media</code> :</p>
+      <pre><code>import express from 'express';
+import upload from '../middlewares/upload.js';
+
+const router = express.Router();
+
+router.post('/upload', upload.single('media'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Fichier requis' });
+  }
+  // req.file contient les infos du média uploadé
+  res.json({ message: 'Fichier uploadé avec succès', file: req.file });
+});
+
+export default router;
+</code></pre>
+    </section>
+
+  </main>
+</body>
+</html>

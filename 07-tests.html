@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>7. Tests - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+ 
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html" class="active">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Tests unitaires et fonctionnels</h1>
+
+    <section>
+      <h2>Pourquoi tester ?</h2>
+      <p>Les tests permettent de s’assurer que vos fonctions et endpoints fonctionnent correctement et évitent les régressions lors des modifications.</p>
+    </section>
+
+    <section>
+      <h2>Exemple de test avec Jest et Supertest</h2>
+      <pre><code>// test/upload.test.js
+import request from 'supertest';
+import app from '../app.js'; // votre instance Express
+
+describe('POST /media/upload', () => {
+  it('doit uploader un fichier et retourner 201', async () => {
+    const res = await request(app)
+      .post('/media/upload')
+      .attach('media', 'tests/files/test-image.jpg');
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('url');
+  });
+
+  it('doit retourner 400 si pas de fichier', async () => {
+    const res = await request(app).post('/media/upload');
+    expect(res.statusCode).toEqual(400);
+  });
+});
+</code></pre>
+
+    </section>
+
+    <section>
+      <h2>Bonnes pratiques</h2>
+      <ul>
+        <li>Isoler la logique métier pour faciliter les tests</li>
+        <li>Tester les cas positifs et négatifs</li>
+        <li>Utiliser des mocks/stubs pour éviter d’appeler l’API Cloudinary en test</li>
+      </ul>
+    </section>
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>1. Introduction - Gestion des médias avec Cloudinary</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
+    nav ul li { display: inline; }
+    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
+    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
+    h1, h2 { color: #004085; }
+    section { margin-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="01-introduction.html" class="active">1. Introduction</a></li>
+      <li><a href="02-dependances.html">2. Dépendances</a></li>
+      <li><a href="03-config-env.html">3. Configuration & .env</a></li>
+      <li><a href="04-middleware.html">4. Middleware</a></li>
+      <li><a href="05-controller.html">5. Controller</a></li>
+      <li><a href="06-routes.html">6. Routes</a></li>
+      <li><a href="07-tests.html">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Introduction à la gestion des médias avec Cloudinary</h1>
+
+    <section>
+      <h2>Pourquoi gérer les médias dans une application web ?</h2>
+      <p>
+        Dans la plupart des applications modernes, la gestion des fichiers médias (images, vidéos, documents) est cruciale pour offrir une expérience utilisateur riche. Que ce soit pour un profil utilisateur, un blog, une boutique en ligne ou un portfolio, le stockage, la transformation et la diffusion optimisée des fichiers médias doivent être maîtrisés.
+      </p>
+    </section>
+
+    <section>
+      <h2>Cloudinary : une solution tout-en-un</h2>
+      <p>
+        Cloudinary est une plateforme cloud spécialisée dans la gestion des médias. Elle offre :
+      </p>
+      <ul>
+        <li>Stockage sécurisé et évolutif</li>
+        <li>Transformation automatique des images et vidéos (redimensionnement, compression, filtres)</li>
+        <li>Diffusion optimisée via un CDN global</li>
+        <li>API facile à utiliser pour intégration avec vos applications</li>
+      </ul>
+      <p>
+        Ce guide va vous montrer comment intégrer Cloudinary dans une application Node.js utilisant Express.
+      </p>
+    </section>
+
+    <section>
+      <h2>Objectifs du guide</h2>
+      <ul>
+        <li>Installer et configurer les dépendances nécessaires</li>
+        <li>Mettre en place un middleware d’upload pour gérer les fichiers</li>
+        <li>Uploader directement vers Cloudinary</li>
+        <li>Gérer la logique métier dans un controller dédié</li>
+        <li>Créer les routes Express pour servir les uploads</li>
+        <li>Tester l’ensemble avec Postman et un front simple React</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Alternatives à Cloudinary</h2>
+      <p>
+        Bien que Cloudinary soit très complet, d’autres services peuvent être envisagés selon vos besoins :
+      </p>
+      <ul>
+        <li><strong>Amazon S3</strong> : stockage simple, couplé souvent à Lambda ou API Gateway pour transformations</li>
+        <li><strong>Google Cloud Storage</strong> : similaire à S3, très bien intégré dans l’écosystème Google</li>
+        <li><strong>Firebase Storage</strong> : très simple pour les projets Firebase, mobile et web</li>
+        <li><strong>Imgix</strong>, <strong>Uploadcare</strong>, <strong>Filestack</strong> : alternatives spécialisées dans la transformation et optimisation d’images</li>
+      </ul>
+      <p>
+        Ce guide reste centré sur Cloudinary mais vous trouverez des alternatives dans chaque section.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
