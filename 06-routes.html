@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <title>6. Routes - Gestion des médias avec Cloudinary</title>
   <link rel="stylesheet" href="style.css" />
- kground: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
-  </style>
+ 
 </head>
 <body>
   <nav class="navbar">
@@ -46,58 +45,6 @@ router.delete('/delete/:public_id', deleteMedia);
 export default router;
 </code></pre>
     </section>
-<section>
-  <h2>Gestion des fichiers avec Multer : <code>upload.single()</code> vs <code>upload.array()</code></h2>
-  
-  <p>
-    Dans l'exemple ci-dessus, la route POST utilise <code>upload.single('media')</code>. Cela signifie que Multer attend un seul fichier envoyé dans le champ nommé <code>media</code> du formulaire.
-  </p>
-  
-  <h3>Que fait <code>upload.single('media')</code> ?</h3>
-  <ul>
-    <li>Il extrait un seul fichier depuis la requête HTTP dans le champ nommé <code>media</code>.</li>
-    <li>Ce fichier est accessible ensuite dans <code>req.file</code> dans le controller.</li>
-    <li>Si aucun fichier n’est envoyé ou si plusieurs fichiers sont envoyés, Multer ne traitera que le premier fichier pour ce champ.</li>
-  </ul>
-  
-  <h3>Pour envoyer plusieurs fichiers à la fois</h3>
-  <p>Si vous souhaitez autoriser l’upload de plusieurs fichiers simultanément, Multer propose deux méthodes :</p>
-  
-  <ol>
-    <li>
-      <code>upload.array(fieldname, maxCount)</code> : permet d’uploader plusieurs fichiers sous un même nom de champ (par exemple <code>photos</code>).<br />
-      Les fichiers seront disponibles dans <code>req.files</code> (notez le pluriel).
-    </li>
-    <li>
-      <code>upload.fields([{ name: 'media', maxCount: 3 }, { name: 'thumbnail', maxCount: 1 }])</code> : permet d’uploader plusieurs fichiers répartis dans différents champs du formulaire.
-    </li>
-  </ol>
-  
-  <h4>Exemple avec <code>upload.array</code> (dans <code>routes/media.routes.js</code>) :</h4>
-  <pre><code>router.post('/upload-multiple', upload.array('media', 5), uploadMediaMultiple);</code></pre>
-  
-  <p>
-    Ici, on attend jusqu’à 5 fichiers dans le champ <code>media</code>. Ces fichiers seront dans <code>req.files</code> et pourront être traités un par un dans le controller.
-  </p>
-  
-  <h4>Exemple avec <code>upload.fields</code> :</h4>
-  <pre><code>router.post('/upload-mixed', upload.fields([
-  { name: 'media', maxCount: 3 },
-  { name: 'thumbnail', maxCount: 1 }
-]), uploadMixedMedia);</code></pre>
-  
-  <p>
-    Ici, le formulaire peut envoyer jusqu’à 3 fichiers dans le champ <code>media</code> et 1 fichier dans <code>thumbnail</code>. 
-    Dans le controller, on accède aux fichiers via <code>req.files['media']</code> et <code>req.files['thumbnail']</code>.
-  </p>
-  
-  <h3>Résumé</h3>
-  <ul>
-    <li><code>upload.single('media')</code> : 1 fichier, accessible via <code>req.file</code></li>
-    <li><code>upload.array('media', maxCount)</code> : plusieurs fichiers, accessibles via <code>req.files</code> (tableau)</li>
-    <li><code>upload.fields([...])</code> : plusieurs fichiers répartis sur plusieurs champs, accessibles via <code>req.files[nomDuChamp]</code></li>
-  </ul>
-</section>
 
     <section>
       <h2>Intégration dans l’application principale</h2>

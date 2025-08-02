@@ -2,19 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>8. Multimédia - Gestion des médias avec Cloudinary</title>
+  <title>7. Tests - Envoi de fichiers avec Postman (Cloudinary)</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
-    nav ul { list-style: none; padding: 0; display: flex; gap: 10px; }
-    nav ul li { display: inline; }
-    nav ul li a { text-decoration: none; color: #333; padding: 5px 10px; border-radius: 5px; }
-    nav ul li a.active, nav ul li a:hover { background-color: #007BFF; color: white; }
-    h1, h2 { color: #004085; }
-    section { margin-bottom: 40px; }
-    pre { background: #000000; padding: 15px; border-radius: 5px; overflow-x: auto; }
-    img, video { max-width: 100%; height: auto; display: block; margin: 10px 0; }
-  </style>
+ 
 </head>
 <body>
   <nav class="navbar">
@@ -25,42 +15,95 @@
       <li><a href="04-middleware.html">4. Middleware</a></li>
       <li><a href="05-controller.html">5. Controller</a></li>
       <li><a href="06-routes.html">6. Routes</a></li>
-      <li><a href="07-tests.html">7. Tests</a></li>
-      <li><a href="08-multimedia.html" class="active">8. Multimédia</a></li>
+      <li><a href="07-tests.html" class="active">7. Tests</a></li>
+      <li><a href="08-multimedia.html">8. Multimédia</a></li>
     </ul>
   </nav>
 
   <main>
-    <h1>Affichage et manipulation des médias</h1>
+    <h1>Tests manuels avec Postman</h1>
 
     <section>
-      <h2>Affichage simple d’une image</h2>
-      <img src="https://res.cloudinary.com/demo/image/upload/v1612376789/sample.jpg" alt="Exemple image" />
-
-      <pre><code>&lt;img src="https://res.cloudinary.com/demo/image/upload/v1612376789/sample.jpg" alt="Exemple image" /&gt;</code></pre>
+      <h2>Objectif</h2>
+      <p>Cette section explique comment tester l’upload de fichiers (images, vidéos...) vers Cloudinary via votre API grâce à <strong>Postman</strong> et le type <code>form-data</code>.</p>
     </section>
 
     <section>
-      <h2>Lecture vidéo depuis Cloudinary</h2>
-      <video controls>
-        <source src="https://res.cloudinary.com/demo/video/upload/v1612376789/sample.mp4" type="video/mp4" />
-        Votre navigateur ne supporte pas la lecture vidéo.
-      </video>
+      <h2>1. Test d’un upload simple avec Postman</h2>
+      <ol>
+        <li>Ouvrez <strong>Postman</strong></li>
+        <li>Créez une requête <strong>POST</strong> vers votre endpoint, par exemple :
+          <code>http://localhost:3000/media/upload</code>
+        </li>
+        <li>Allez dans l’onglet <strong>Body</strong></li>
+        <li>Sélectionnez <strong>form-data</strong></li>
+        <li>Ajoutez un champ :
+          <ul>
+            <li>Clé : <code>media</code> (doit correspondre à <code>upload.single('media')</code>)</li>
+            <li>Type : <strong>File</strong></li>
+            <li>Choisissez un fichier local à uploader (image, vidéo, PDF...)</li>
+          </ul>
+        </li>
+        <li>Cliquez sur <strong>Send</strong></li>
+      </ol>
 
-      <pre><code>&lt;video controls&gt;
-  &lt;source src="https://res.cloudinary.com/demo/video/upload/v1612376789/sample.mp4" type="video/mp4" /&gt;
-  Votre navigateur ne supporte pas la lecture vidéo.
-&lt;/video&gt;</code></pre>
+      <p>Si tout fonctionne, vous recevrez une réponse <code>201</code> avec un objet JSON contenant l’URL du média stocké dans Cloudinary :</p>
+
+      <pre><code>{
+  "message": "Upload réussi",
+  "data": {
+    "url": "https://res.cloudinary.com/.../image/upload/v12345/xyz.jpg",
+    "public_id": "xyz",
+    "mimetype": "image/jpeg",
+    "size": 234567
+  }
+}
+</code></pre>
     </section>
 
     <section>
-      <h2>Transformation dynamique des médias</h2>
-      <p>Cloudinary permet de transformer les images et vidéos à la volée grâce à des paramètres dans l’URL, par exemple :</p>
+      <h2>2. Test d’un upload multiple</h2>
+      <p>Si vous utilisez un middleware de type <code>upload.array('media', 5)</code> :</p>
+      <ol>
+        <li>Suivez la même procédure que ci-dessus, mais ajoutez plusieurs champs <strong>form-data</strong> avec la même clé : <code>media</code></li>
+        <li>Pour chaque champ :
+          <ul>
+            <li>Sélectionnez le type <strong>File</strong></li>
+            <li>Ajoutez un fichier différent</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p>Votre controller recevra alors un tableau de fichiers dans <code>req.files</code>.</p>
+
+      <p><strong>⚠️ Important :</strong> le nom de la clé (<code>media</code>) doit correspondre exactement à celui défini dans le middleware Multer.</p>
+    </section>
+
+    <section>
+      <h2>3. Supprimer un média via Postman</h2>
+      <p>Si vous avez une route <code>DELETE /media/delete/:public_id</code>, vous pouvez la tester ainsi :</p>
+      <ol>
+        <li>Utilisez une requête <strong>DELETE</strong></li>
+        <li>L’URL doit contenir le <code>public_id</code> retourné lors de l’upload :
+          <code>http://localhost:3000/media/delete/xyz</code>
+        </li>
+        <li>Cliquez sur <strong>Send</strong></li>
+      </ol>
+      <p>La réponse JSON doit confirmer la suppression :</p>
+      <pre><code>{
+  "message": "Fichier supprimé avec succès"
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Bonnes pratiques de test Postman</h2>
       <ul>
-        <li>Redimensionner une image : <code>https://res.cloudinary.com/demo/image/upload/w_300,h_200/sample.jpg</code></li>
-        <li>Appliquer un filtre de flou : <code>https://res.cloudinary.com/demo/image/upload/e_blur:200/sample.jpg</code></li>
+        <li>Utiliser toujours <strong>form-data</strong> pour envoyer des fichiers</li>
+        <li>Bien définir les types des champs (<strong>File</strong> et non Text)</li>
+        <li>Tester aussi les cas d’erreur : sans fichier, avec mauvais nom de champ, fichiers trop lourds, etc.</li>
       </ul>
     </section>
+
   </main>
 </body>
 </html>

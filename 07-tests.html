@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>7. Tests - Gestion des médias avec Cloudinary</title>
+  <title>7. Tests - Envoi de fichiers avec Postman (Cloudinary)</title>
   <link rel="stylesheet" href="style.css" />
  
 </head>
@@ -21,45 +21,86 @@
   </nav>
 
   <main>
-    <h1>Tests unitaires et fonctionnels</h1>
+    <h1>Tests manuels avec Postman</h1>
 
     <section>
-      <h2>Pourquoi tester ?</h2>
-      <p>Les tests permettent de s’assurer que vos fonctions et endpoints fonctionnent correctement et évitent les régressions lors des modifications.</p>
+      <h2>Objectif</h2>
+      <p>Cette section explique comment tester l’upload de fichiers (images, vidéos...) vers Cloudinary via votre API grâce à <strong>Postman</strong> et le type <code>form-data</code>.</p>
     </section>
 
     <section>
-      <h2>Exemple de test avec Jest et Supertest</h2>
-      <pre><code>// test/upload.test.js
-import request from 'supertest';
-import app from '../app.js'; // votre instance Express
+      <h2>1. Test d’un upload simple avec Postman</h2>
+      <ol>
+        <li>Ouvrez <strong>Postman</strong></li>
+        <li>Créez une requête <strong>POST</strong> vers votre endpoint, par exemple :
+          <code>http://localhost:3000/media/upload</code>
+        </li>
+        <li>Allez dans l’onglet <strong>Body</strong></li>
+        <li>Sélectionnez <strong>form-data</strong></li>
+        <li>Ajoutez un champ :
+          <ul>
+            <li>Clé : <code>media</code> (doit correspondre à <code>upload.single('media')</code>)</li>
+            <li>Type : <strong>File</strong></li>
+            <li>Choisissez un fichier local à uploader (image, vidéo, PDF...)</li>
+          </ul>
+        </li>
+        <li>Cliquez sur <strong>Send</strong></li>
+      </ol>
 
-describe('POST /media/upload', () => {
-  it('doit uploader un fichier et retourner 201', async () => {
-    const res = await request(app)
-      .post('/media/upload')
-      .attach('media', 'tests/files/test-image.jpg');
+      <p>Si tout fonctionne, vous recevrez une réponse <code>201</code> avec un objet JSON contenant l’URL du média stocké dans Cloudinary :</p>
 
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('url');
-  });
-
-  it('doit retourner 400 si pas de fichier', async () => {
-    const res = await request(app).post('/media/upload');
-    expect(res.statusCode).toEqual(400);
-  });
-});
+      <pre><code>{
+  "message": "Upload réussi",
+  "data": {
+    "url": "https://res.cloudinary.com/.../image/upload/v12345/xyz.jpg",
+    "public_id": "xyz",
+    "mimetype": "image/jpeg",
+    "size": 234567
+  }
+}
 </code></pre>
-
     </section>
 
     <section>
-      <h2>Bonnes pratiques</h2>
+      <h2>2. Test d’un upload multiple</h2>
+      <p>Si vous utilisez un middleware de type <code>upload.array('media', 5)</code> :</p>
+      <ol>
+        <li>Suivez la même procédure que ci-dessus, mais ajoutez plusieurs champs <strong>form-data</strong> avec la même clé : <code>media</code></li>
+        <li>Pour chaque champ :
+          <ul>
+            <li>Sélectionnez le type <strong>File</strong></li>
+            <li>Ajoutez un fichier différent</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p>Votre controller recevra alors un tableau de fichiers dans <code>req.files</code>.</p>
+
+      <p><strong>⚠️ Important :</strong> le nom de la clé (<code>media</code>) doit correspondre exactement à celui défini dans le middleware Multer.</p>
+    </section>
+
+    <section>
+      <h2>3. Supprimer un média via Postman</h2>
+      <p>Si vous avez une route <code>DELETE /media/delete/:public_id</code>, vous pouvez la tester ainsi :</p>
+      <ol>
+        <li>Utilisez une requête <strong>DELETE</strong></li>
+        <li>L’URL doit contenir le <code>public_id</code> retourné lors de l’upload :
+          <code>http://localhost:3000/media/delete/xyz</code>
+        </li>
+        <li>Cliquez sur <strong>Send</strong></li>
+      </ol>
+      <p>La réponse JSON doit confirmer la suppression :</p>
+      <pre><code>{
+  "message": "Fichier supprimé avec succès"
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Bonnes pratiques de test Postman</h2>
       <ul>
-        <li>Isoler la logique métier pour faciliter les tests</li>
-        <li>Tester les cas positifs et négatifs</li>
-        <li>Utiliser des mocks/stubs pour éviter d’appeler l’API Cloudinary en test</li>
+        <li>Utiliser toujours <strong>form-data</strong> pour envoyer des fichiers</li>
+        <li>Bien définir les types des champs (<strong>File</strong> et non Text)</li>
+        <li>Tester aussi les cas d’erreur : sans fichier, avec mauvais nom de champ, fichiers trop lourds, etc.</li>
       </ul>
     </section>
 
